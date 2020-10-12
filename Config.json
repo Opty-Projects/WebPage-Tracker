@@ -1,0 +1,36 @@
+{
+    "WebPages": [
+        {
+            "Name": "<WebPage-1-Name>",
+            "URL": "<WebPage-1-URL>"
+        },
+        {
+            "Name": "<WebPage-2-Name>",
+            "URL": "<WebPage-2-URL>"
+        }
+    ],
+    "SecsTillReplay": 60,
+    "SMTP": {
+        "To": [
+            "<Listener-1-E-Mail>",
+            "<Listener-2-E-Mail>"
+        ],
+        "Content": {
+            "_Comment_": "Optionally you're able to change Notifications Content modifying 'Subject' & 'Body'",
+            "Subject": "{Name} - WebPage Modified",
+            "Body": "The WebPage {Name} you're tracking has been changed!\n"
+        },
+        "Notifier": {
+            "_Comment-1_": "Optionally you're able to change Notifier modifying 'User' & 'Password'",
+            "_Comment-2_": "If you do so, 'Less Secure App Access' needs to be enabled in Notifier Gmail Account",
+            "User": "web.page.tracker.notifier@gmail.com",
+            "Password": "T4rnSUy2FaY3Zcc"
+        },
+        "Server": {
+            "_Comment_": "Optionally you're able to change SMTP Server modifying 'Host' & 'Port'",
+            "Host": "smtp.gmail.com",
+            "Port": 587
+        }
+    }
+}
+
