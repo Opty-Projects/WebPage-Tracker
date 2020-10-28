@@ -2,14 +2,16 @@
 
 <img src="./Pictures/WebPage-Tracker-Icon.png" alt="WebPage-Tracker-Icon" width="200">
 
-This Program detects Modifications to WebPages and, as a result, sends E-Mail Notifications to its Listeners.
+This Program detects Modifications to WebPages and, as a result, sends E-Mail Notifications to its Listeners
 
 ### Setup
 
 You **need** to Setup the Program by filling in [Config.json](./Config.json):
 
-- `WebPages` Param: List of WebPages you wanna Track, its size is up to you.
-- `SMTP`:`To` Param: List of E-Mails you wanna Notify whenever a WebPage is Modified.
+- `WebPages` (List) Param:
+    - `Login` Field: Consists in a Login `Link` & `Credentials`, if Login isn't required to Access the `Targets` remove this Field
+    - `Targets` (List) Field: Each Target Consists in a WebPage `Name` & `Link`
+- `EmailNotifications`:`Subscribers` Param: List of E-Mails you wanna Notify whenever a WebPage is Modified
 
 ### To Run
 

@@ -1,49 +1,55 @@
 from json import load
-from requests import get
 from hashlib import sha1
 from smtplib import SMTP, SMTPException
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from time import sleep
+from requests import session
+from Lib.Driver import doLogin
 
 
 def main(conf):
     while True:
         for wp in conf["WebPages"]:
-            if checkWP(wp):
-                try:
-                    notify(conf["SMTP"], wp["Name"])
-                except SMTPException as e:
-                    print("Error: '{}'".format(e))
-        sleep(conf["SecsTillReplay"])
+            s = session()
+            if "Login" in wp:
+                doLogin(s, wp["Login"])
+            for trg in wp["Targets"]:
+                if checkWP(s, trg):
+                    try:
+                        notify(conf["EmailNotifications"], trg)
+                    except SMTPException as e:
+                        print("Error: '{}'".format(e))
+            sleep(conf["SecsTillReplay"])
 
 
-def checkWP(wp):
-    r = get(wp["URL"])
+def checkWP(s, trg):
+    r = s.get(trg["Link"])
     if r:
         h = sha1(r.text.encode("UTF-8")).hexdigest()
         try:
-            if wp["Hash"] != h:
-                wp["Hash"] = h
+            if trg["Hash"] != h:
+                trg["Hash"] = h
                 return True
         except KeyError:
-            wp["Hash"] = h
+            trg["Hash"] = h
     return False
 
 
-def notify(smtp, name):
+def notify(ntf, trg):
     m = MIMEMultipart()
-    m["From"] = smtp["Notifier"]["User"]
-    m["To"] = ','.join(smtp["To"])
-    m["Subject"] = smtp["Content"]["Subject"].format(Name=name)
-    m.attach(MIMEText(smtp["Content"]["Body"].format(Name=name), "plain"))
+    m["From"] = ntf["Notifier"]["Credentials"]["Email"]
+    m["To"] = ','.join(ntf["Subscribers"])
+    m["Subject"] = ntf["Content"]["Subject"].format(Name=trg["Name"])
+    con = ntf["Content"]["Body"].format(Name=trg["Name"])
+    con += "\nCheck it <a href='{Link}'>Here</a>!".format(Link=trg["Link"])
+    m.attach(MIMEText(con, "html"))
 
-    with SMTP(smtp["Server"]["Host"], smtp["Server"]["Port"]) as s:
+    with SMTP(ntf["SMTPServer"]["Host"], ntf["SMTPServer"]["Port"]) as s:
         s.starttls()
-        s.login(smtp["Notifier"]["User"], smtp["Notifier"]["Password"])
-        s.sendmail(smtp["Notifier"]["User"], smtp["To"], m.as_string())
+        s.login(ntf["Notifier"]["Credentials"]["Email"], ntf["Notifier"]["Credentials"]["Password"])
+        s.sendmail(ntf["Notifier"]["Credentials"]["Email"], ntf["Subscribers"], m.as_string())
 
 
 if __name__ == "__main__":
-    main(load(open("Config.json", 'r')))
-
+    main(load(open("MyConfig.json", 'r')))
